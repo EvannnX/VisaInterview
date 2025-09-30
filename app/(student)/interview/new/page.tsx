@@ -4,12 +4,12 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Globe, Users, Mic, X, Plus } from 'lucide-react';
-import Navbar from '../../../../components/Navbar';
-import { Card, CardHeader, CardBody } from '../../../../components/Card';
-import Button from '../../../../components/Button';
-import Input from '../../../../components/Input';
+import Navbar from '../../../components/Navbar';
+import { Card, CardHeader, CardBody } from '../../../components/Card';
+import Button from '../../../components/Button';
+import Input from '../../../components/Input';
 import toast from 'react-hot-toast';
-import { AVAILABLE_VOICES } from '../../../../lib/speech';
+import { AVAILABLE_VOICES } from '../../../lib/speech';
 
 export default function NewInterviewPage() {
   const router = useRouter();
