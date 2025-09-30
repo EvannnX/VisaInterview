@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
               textEn: translatedText,
               textZh: chineseText,
               visaType,
-              topic: 'CUSTOM',
+              topic: 'OTHER', // Use OTHER for custom questions
               difficulty: 'MEDIUM',
               isActive: true,
               tips: 'Custom question created by user',
