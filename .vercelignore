@@ -1,16 +1,41 @@
-node_modules
-.next
-.env
+# 本地环境文件
 .env.local
-npm-debug.log
-yarn-error.log
-.DS_Store
-*.log
-coverage
-.vscode
-.idea
-docker-compose*.yml
+.env.*.local
+
+# 缓存
+node_modules/.cache
+.next/cache
+
+# Git
+.git
+
+# Docker相关
+docker-compose.yml
+docker-compose.simple.yml
 Dockerfile
-*.md
-!README.md
-prisma/migrations
+
+# 脚本和文档（保留 README.md）
+scripts/
+一键启动.command
+一键启动.bat
+一键部署.sh
+配置TTS.sh
+CONTRIBUTING.md
+DEPLOYMENT.md
+QUICKSTART.md
+PROJECT_SUMMARY.md
+START_HERE.md
+Railway正确配置指南.md
+Vercel导航指南.md
+Vercel环境变量配置.md
+修复Vercel环境变量错误.md
+初始化数据库.md
+配置Vercel-步骤.md
+彻底修复DATABASE_URL.md
+TTS故障排查.md
+语音服务配置指南.md
+获取API-Key步骤.md
+配置完成-重启指南.md
+使用说明.md
+快速启动指南.md
+部署指南-Vercel-Railway.md
