@@ -8,7 +8,7 @@ import { FileText, Eye } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import { Card, CardHeader, CardBody } from '@/components/Card';
 import Button from '@/components/Button';
-import { formatDate } from '@/lib/utils';
+import { formatDate } from '../../../../lib/utils';
 
 export default function ReportsPage() {
   const { data: session, status } = useSession();

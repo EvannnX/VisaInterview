@@ -8,7 +8,7 @@ import Navbar from '@/components/Navbar';
 import { Card, CardHeader, CardBody } from '@/components/Card';
 import Button from '@/components/Button';
 import toast from 'react-hot-toast';
-import { AudioRecorder } from '@/lib/speech';
+import { AudioRecorder } from '../../../../lib/speech';
 
 interface InterviewData {
   id: string;

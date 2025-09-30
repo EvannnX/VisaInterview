@@ -5,9 +5,9 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { Users, FileText, TrendingUp, BookOpen } from 'lucide-react';
-import Navbar from '@/components/Navbar';
-import { Card, CardHeader, CardBody } from '@/components/Card';
-import Button from '@/components/Button';
+import Navbar from '../../../components/Navbar';
+import { Card, CardHeader, CardBody } from '../../../components/Card';
+import Button from '../../../components/Button';
 
 export default function AdminDashboardPage() {
   const { data: session, status } = useSession();

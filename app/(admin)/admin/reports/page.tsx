@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { FileText, TrendingUp, Users } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import { Card, CardHeader, CardBody } from '@/components/Card';
-import { formatDate } from '@/lib/utils';
+import { formatDate } from '../../../../lib/utils';
 
 export default function AdminReportsPage() {
   const { data: session, status } = useSession();

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { GraduationCap, Mic, BarChart, FileText, Globe, CheckCircle } from 'lucide-react';
-import Button from '@/components/Button';
+import Button from '../components/Button';
 
 export default function HomePage() {
   return (

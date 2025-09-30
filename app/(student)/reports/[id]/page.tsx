@@ -13,7 +13,7 @@ import {
 import Navbar from '@/components/Navbar';
 import { Card, CardHeader, CardBody } from '@/components/Card';
 import Button from '@/components/Button';
-import { formatDate } from '@/lib/utils';
+import { formatDate } from '../../../../lib/utils';
 
 export default function ReportDetailPage({ params }: { params: { id: string } }) {
   const { status } = useSession();

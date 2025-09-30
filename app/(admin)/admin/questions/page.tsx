@@ -5,9 +5,9 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Plus, Search, Edit, Trash2 } from 'lucide-react';
-import Navbar from '@/components/Navbar';
-import { Card, CardHeader, CardBody } from '@/components/Card';
-import Button from '@/components/Button';
+import Navbar from '../../../../components/Navbar';
+import { Card, CardHeader, CardBody } from '../../../../components/Card';
+import Button from '../../../../components/Button';
 import Input from '@/components/Input';
 import toast from 'react-hot-toast';
 
