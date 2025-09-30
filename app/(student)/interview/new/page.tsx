@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Globe, Users, Mic, X, Plus } from 'lucide-react';
@@ -28,18 +28,10 @@ export default function NewInterviewPage() {
   const [customQuestions, setCustomQuestions] = useState<string[]>([]);
   const [newCustomQuestion, setNewCustomQuestion] = useState('');
 
-  // 获取可用题目（用于自定义模式）
-  useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/login');
+  const fetchAvailableQuestions = useCallback(async () => {
+    if (status !== 'authenticated' || interviewMode !== 'custom') {
       return;
     }
-    if (interviewMode === 'custom') {
-      fetchAvailableQuestions();
-    }
-  }, [interviewMode, formData.visaType, status, router]);
-
-  const fetchAvailableQuestions = async () => {
     try {
       const response = await fetch(`/api/questions?visaType=${formData.visaType}&limit=500`);
       const data = await response.json();
@@ -47,7 +39,17 @@ export default function NewInterviewPage() {
     } catch (error) {
       console.error('获取题目失败:', error);
     }
-  };
+  }, [status, interviewMode, formData.visaType]);
+
+  // 获取可用题目（用于自定义模式）
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/login');
+      return;
+    }
+
+    fetchAvailableQuestions();
+  }, [status, router, fetchAvailableQuestions]);
 
   if (status === 'unauthenticated') {
     return null;

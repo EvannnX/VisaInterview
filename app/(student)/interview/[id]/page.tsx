@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Mic, Square, Volume2, ChevronRight, ChevronLeft } from 'lucide-react';
@@ -37,15 +37,7 @@ export default function InterviewPage({ params }: { params: { id: string } }) {
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/login');
-    } else if (status === 'authenticated') {
-      fetchInterview();
-    }
-  }, [status, params.id]);
-
-  const fetchInterview = async () => {
+  const fetchInterview = useCallback(async () => {
     try {
       const response = await fetch(`/api/interview/${params.id}`);
       const data = await response.json();
@@ -61,7 +53,15 @@ export default function InterviewPage({ params }: { params: { id: string } }) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [params.id, router]);
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/login');
+    } else if (status === 'authenticated') {
+      fetchInterview();
+    }
+  }, [status, router, fetchInterview]);
 
   const playQuestion = async () => {
     const currentQuestion = interview?.questions[currentQuestionIndex];

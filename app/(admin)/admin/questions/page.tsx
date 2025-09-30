@@ -2,7 +2,7 @@
 
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Plus, Search, Edit, Trash2 } from 'lucide-react';
 import Navbar from '../../../../components/Navbar';
@@ -26,23 +26,7 @@ export default function QuestionsManagementPage() {
     totalPages: 0,
   });
 
-  useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/login');
-    } else if (status === 'authenticated' && session?.user?.role !== 'ADMIN') {
-      router.push('/dashboard');
-    } else if (status === 'authenticated') {
-      fetchQuestions();
-    }
-  }, [status, session, router]);
-
-  useEffect(() => {
-    if (status === 'authenticated' && session?.user?.role === 'ADMIN') {
-      fetchQuestions();
-    }
-  }, [filterVisaType]);
-
-  const fetchQuestions = async () => {
+  const fetchQuestions = useCallback(async () => {
     try {
       setIsLoading(true);
       const params = new URLSearchParams();
@@ -72,7 +56,23 @@ export default function QuestionsManagementPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [filterVisaType]);
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/login');
+      return;
+    }
+
+    if (status === 'authenticated' && session?.user?.role !== 'ADMIN') {
+      router.push('/dashboard');
+      return;
+    }
+
+    if (status === 'authenticated') {
+      fetchQuestions();
+    }
+  }, [status, session?.user?.role, router, fetchQuestions, filterVisaType]);
 
   const handleDelete = async (id: string) => {
     if (!confirm('确定要删除这道题目吗？')) {

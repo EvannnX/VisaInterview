@@ -2,7 +2,7 @@
 
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { PlayCircle, FileText, TrendingUp, Clock } from 'lucide-react';
 import Navbar from '../../../components/Navbar';
@@ -22,13 +22,7 @@ export default function DashboardPage() {
     }
   }, [status, router]);
 
-  useEffect(() => {
-    if (session?.user?.id) {
-      fetchReports();
-    }
-  }, [session]);
-
-  const fetchReports = async () => {
+  const fetchReports = useCallback(async () => {
     try {
       const response = await fetch(`/api/reports/user/${session?.user?.id}`);
       const data = await response.json();
@@ -38,7 +32,13 @@ export default function DashboardPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [session?.user?.id]);
+
+  useEffect(() => {
+    if (session?.user?.id) {
+      fetchReports();
+    }
+  }, [session?.user?.id, fetchReports]);
 
   if (status === 'loading' || isLoading) {
     return (

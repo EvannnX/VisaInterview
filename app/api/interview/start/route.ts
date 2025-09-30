@@ -48,11 +48,13 @@ export async function POST(req: NextRequest) {
           // 创建临时题目
           const tempQuestion = await prisma.question.create({
             data: {
+              text: translatedText,
               textEn: translatedText,
               textZh: chineseText,
               visaType,
               topic: 'OTHER', // Use OTHER for custom questions
               difficulty: 'MEDIUM',
+              followUps: [],
               isActive: true,
               tips: 'Custom question created by user',
             },

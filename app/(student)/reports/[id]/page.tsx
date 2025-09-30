@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import {
@@ -21,15 +21,7 @@ export default function ReportDetailPage({ params }: { params: { id: string } })
   const [report, setReport] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/login');
-    } else if (status === 'authenticated') {
-      fetchReport();
-    }
-  }, [status, params.id]);
-
-  const fetchReport = async () => {
+  const fetchReport = useCallback(async () => {
     try {
       const response = await fetch(`/api/reports/${params.id}`);
       const data = await response.json();
@@ -45,7 +37,15 @@ export default function ReportDetailPage({ params }: { params: { id: string } })
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [params.id, router]);
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/login');
+    } else if (status === 'authenticated') {
+      fetchReport();
+    }
+  }, [status, router, fetchReport]);
 
   if (isLoading || !report) {
     return (
