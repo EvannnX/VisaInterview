@@ -10,9 +10,9 @@ import {
   AlertCircle,
   Download,
 } from 'lucide-react';
-import Navbar from '../../../../components/Navbar';
-import { Card, CardHeader, CardBody } from '../../../../components/Card';
-import Button from '../../../../components/Button';
+import Navbar from '../../../components/Navbar';
+import { Card, CardHeader, CardBody } from '../../../components/Card';
+import Button from '../../../components/Button';
 import { formatDate } from '../../../../lib/utils';
 
 export default function ReportDetailPage({ params }: { params: { id: string } }) {

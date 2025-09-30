@@ -4,9 +4,9 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Mic, Square, Volume2, ChevronRight, ChevronLeft } from 'lucide-react';
-import Navbar from '../../../../components/Navbar';
-import { Card, CardHeader, CardBody } from '../../../../components/Card';
-import Button from '../../../../components/Button';
+import Navbar from '../../../components/Navbar';
+import { Card, CardHeader, CardBody } from '../../../components/Card';
+import Button from '../../../components/Button';
 import toast from 'react-hot-toast';
 import { AudioRecorder } from '../../../../lib/speech';
 
