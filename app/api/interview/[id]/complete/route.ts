@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '../../lib/auth';
-import { prisma } from '../../lib/prisma';
-import { calculateInterviewReport } from '../../lib/scoring';
+import { authOptions } from '../../../../lib/auth';
+import { prisma } from '../../../../lib/prisma';
+import { calculateInterviewReport } from '../../../../lib/scoring';
 
 export async function POST(
   req: NextRequest,
