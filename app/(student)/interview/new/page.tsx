@@ -28,17 +28,16 @@ export default function NewInterviewPage() {
   const [customQuestions, setCustomQuestions] = useState<string[]>([]);
   const [newCustomQuestion, setNewCustomQuestion] = useState('');
 
-  if (status === 'unauthenticated') {
-    router.push('/login');
-    return null;
-  }
-
   // 获取可用题目（用于自定义模式）
   useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/login');
+      return;
+    }
     if (interviewMode === 'custom') {
       fetchAvailableQuestions();
     }
-  }, [interviewMode, formData.visaType]);
+  }, [interviewMode, formData.visaType, status, router]);
 
   const fetchAvailableQuestions = async () => {
     try {
@@ -49,6 +48,10 @@ export default function NewInterviewPage() {
       console.error('获取题目失败:', error);
     }
   };
+
+  if (status === 'unauthenticated') {
+    return null;
+  }
 
   const toggleQuestionSelection = (questionId: string) => {
     if (selectedQuestions.includes(questionId)) {
