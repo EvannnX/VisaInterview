@@ -5,8 +5,8 @@ import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { GraduationCap } from 'lucide-react';
-import Input from '@/components/Input';
-import Button from '@/components/Button';
+import Input from '../../../components/Input';
+import Button from '../../../components/Button';
 import toast from 'react-hot-toast';
 
 export default function LoginPage() {
