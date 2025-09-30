@@ -9,7 +9,7 @@ import { Card, CardHeader, CardBody } from '../../../../components/Card';
 import Button from '../../../../components/Button';
 import Input from '../../../../components/Input';
 import toast from 'react-hot-toast';
-import { AVAILABLE_VOICES } from '../../../../lib/speech';
+import { AVAILABLE_VOICES } from '../../../../../lib/speech';
 
 export default function NewInterviewPage() {
   const router = useRouter();
