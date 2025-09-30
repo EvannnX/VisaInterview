@@ -1,0 +1,177 @@
+// Prisma Schema for Visa Interview Simulator
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 用户模型
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      Role     @default(STUDENT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 关系
+  interviews Interview[]
+  reports    Report[]
+
+  @@map("users")
+}
+
+enum Role {
+  STUDENT
+  ADMIN
+}
+
+// 签证类型
+enum VisaType {
+  F1_STUDENT      // F1 学生签证
+  H1B_WORK        // H1B 工作签证
+  B1B2_TOURIST    // B1/B2 旅游商务签证
+  J1_EXCHANGE     // J1 交流访问签证
+  L1_TRANSFER     // L1 公司内部调动签证
+}
+
+// 难度等级
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+// 题目主题
+enum QuestionTopic {
+  PERSONAL_INFO       // 个人信息
+  STUDY_PLAN          // 学习计划
+  FINANCIAL           // 财务状况
+  CAREER              // 职业规划
+  TIES_TO_HOME        // 国内联系
+  PROGRAM_DETAILS     // 项目细节
+  IMMIGRATION_INTENT  // 移民倾向
+  BACKGROUND          // 背景调查
+  OTHER               // 其他
+}
+
+// 题库
+model Question {
+  id          String          @id @default(cuid())
+  text        String
+  textEn      String?         // 英文问题文本
+  textZh      String?         // 中文翻译
+  visaType    VisaType
+  country     String          @default("USA")
+  topic       QuestionTopic
+  difficulty  Difficulty
+  followUps   String[]        // 可能的追问
+  rubric      Json?           // 评分标准 (JSON格式)
+  sampleAnswer String?        // 参考答案
+  tips        String?         // 答题提示
+  isActive    Boolean         @default(true)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  // 关系
+  interviewQuestions InterviewQuestion[]
+
+  @@map("questions")
+}
+
+// 面试会话
+model Interview {
+  id          String         @id @default(cuid())
+  userId      String
+  visaType    VisaType
+  accentType  String         @default("en-US-Female") // 语音口音类型
+  totalQuestions Int         @default(10)
+  status      InterviewStatus @default(IN_PROGRESS)
+  startedAt   DateTime       @default(now())
+  completedAt DateTime?
+  totalScore  Float?
+  
+  // 关系
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questions   InterviewQuestion[]
+  report      Report?
+
+  @@map("interviews")
+}
+
+enum InterviewStatus {
+  IN_PROGRESS
+  COMPLETED
+  ABANDONED
+}
+
+// 面试题目（面试会话中的具体题目）
+model InterviewQuestion {
+  id              String    @id @default(cuid())
+  interviewId     String
+  questionId      String
+  order           Int       // 问题顺序
+  audioUrl        String?   // TTS生成的音频URL
+  userAnswer      String?   // 用户回答文本
+  audioAnswer     String?   // 用户录音URL
+  transcription   String?   // ASR转写文本
+  score           Float?    // 该题得分
+  feedback        Json?     // 反馈内容（JSON格式）
+  answeredAt      DateTime?
+  
+  // 关系
+  interview   Interview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+  question    Question  @relation(fields: [questionId], references: [id])
+
+  @@unique([interviewId, order])
+  @@map("interview_questions")
+}
+
+// 面试报告
+model Report {
+  id              String   @id @default(cuid())
+  interviewId     String   @unique
+  userId          String
+  
+  // 总体评分
+  totalScore      Float
+  contentScore    Float    // 内容分 (40%)
+  languageScore   Float    // 语言分 (30%)
+  performanceScore Float   // 表现分 (20%)
+  riskScore       Float    // 风险分 (10%)
+  
+  // 详细反馈
+  strengths       String[] // 优点
+  weaknesses      String[] // 需改进之处
+  suggestions     String[] // 建议
+  overallFeedback String   // 总体评价
+  
+  // 统计数据
+  totalQuestions  Int
+  averageResponseTime Float?
+  
+  createdAt       DateTime @default(now())
+  
+  // 关系
+  interview   Interview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("reports")
+}
+
+// 系统配置
+model SystemConfig {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("system_configs")
+}
+

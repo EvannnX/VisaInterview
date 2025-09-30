@@ -1,0 +1,16 @@
+node_modules
+.next
+.env
+.env.local
+npm-debug.log
+yarn-error.log
+.DS_Store
+*.log
+coverage
+.vscode
+.idea
+docker-compose*.yml
+Dockerfile
+*.md
+!README.md
+prisma/migrations
