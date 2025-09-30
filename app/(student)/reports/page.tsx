@@ -5,9 +5,9 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { FileText, Eye } from 'lucide-react';
-import Navbar from '@/components/Navbar';
-import { Card, CardHeader, CardBody } from '@/components/Card';
-import Button from '@/components/Button';
+import Navbar from '../../../../components/Navbar';
+import { Card, CardHeader, CardBody } from '../../../../components/Card';
+import Button from '../../../../components/Button';
 import { formatDate } from '../../../../lib/utils';
 
 export default function ReportsPage() {

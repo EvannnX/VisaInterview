@@ -5,9 +5,9 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { PlayCircle, FileText, TrendingUp, Clock } from 'lucide-react';
-import Navbar from '@/components/Navbar';
-import { Card, CardHeader, CardBody } from '@/components/Card';
-import Button from '@/components/Button';
+import Navbar from '../../../../components/Navbar';
+import { Card, CardHeader, CardBody } from '../../../../components/Card';
+import Button from '../../../../components/Button';
 import { formatDate } from '../../../../lib/utils';
 
 export default function DashboardPage() {
