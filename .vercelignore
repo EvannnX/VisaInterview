@@ -1,6 +1,0 @@
-# 只忽略 Docker 和脚本
-docker-compose.yml
-docker-compose.simple.yml
-Dockerfile
-一键启动.command
-一键启动.bat
