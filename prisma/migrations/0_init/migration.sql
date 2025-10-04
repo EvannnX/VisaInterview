@@ -1,132 +1,101 @@
 -- CreateEnum
-CREATE TYPE "UserRole" AS ENUM ('STUDENT', 'ADMIN');
-
--- CreateEnum
+CREATE TYPE "Role" AS ENUM ('STUDENT', 'ADMIN');
 CREATE TYPE "VisaType" AS ENUM ('F1_STUDENT', 'H1B_WORK', 'B1B2_TOURIST', 'J1_EXCHANGE', 'L1_TRANSFER');
-
--- CreateEnum
 CREATE TYPE "Difficulty" AS ENUM ('EASY', 'MEDIUM', 'HARD');
+CREATE TYPE "QuestionTopic" AS ENUM ('PERSONAL_INFO', 'STUDY_PLAN', 'FINANCIAL', 'CAREER', 'TIES_TO_HOME', 'PROGRAM_DETAILS', 'IMMIGRATION_INTENT', 'BACKGROUND', 'OTHER');
+CREATE TYPE "InterviewStatus" AS ENUM ('IN_PROGRESS', 'COMPLETED', 'ABANDONED');
+CREATE TABLE "users" (
+  "id" TEXT NOT NULL,
+  "email" TEXT NOT NULL,
+  "name" TEXT NOT NULL,
+  "password" TEXT NOT NULL,
+  "role" "Role" NOT NULL DEFAULT 'STUDENT',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL,
 
--- CreateEnum
-CREATE TYPE "InterviewStatus" AS ENUM ('IN_PROGRESS', 'COMPLETED', 'CANCELLED');
-
--- CreateTable
-CREATE TABLE "User" (
-    "id" TEXT NOT NULL,
-    "email" TEXT NOT NULL,
-    "password" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "role" "UserRole" NOT NULL DEFAULT 'STUDENT',
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+  CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
+CREATE TABLE "questions" (
+  "id" TEXT NOT NULL,
+  "text" TEXT NOT NULL,
+  "textEn" TEXT,
+  "textZh" TEXT,
+  "visaType" "VisaType" NOT NULL,
+  "country" TEXT NOT NULL DEFAULT 'USA',
+  "topic" "QuestionTopic" NOT NULL,
+  "difficulty" "Difficulty" NOT NULL,
+  "followUps" TEXT[],
+  "rubric" JSONB,
+  "sampleAnswer" TEXT,
+  "tips" TEXT,
+  "isActive" BOOLEAN NOT NULL DEFAULT true,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL,
 
--- CreateTable
-CREATE TABLE "Question" (
-    "id" TEXT NOT NULL,
-    "textEn" TEXT NOT NULL,
-    "textZh" TEXT NOT NULL,
-    "visaType" "VisaType" NOT NULL,
-    "topic" TEXT NOT NULL,
-    "difficulty" "Difficulty" NOT NULL DEFAULT 'MEDIUM',
-    "tips" TEXT,
-    "sampleAnswer" TEXT,
-    "followUpQuestions" TEXT[],
-    "rubric" JSONB,
-    "isActive" BOOLEAN NOT NULL DEFAULT true,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "Question_pkey" PRIMARY KEY ("id")
+  CONSTRAINT "questions_pkey" PRIMARY KEY ("id")
 );
+CREATE TABLE "interviews" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "visaType" "VisaType" NOT NULL,
+  "accentType" TEXT NOT NULL DEFAULT 'en-US-Female',
+  "totalQuestions" INTEGER NOT NULL DEFAULT 10,
+  "status" "InterviewStatus" NOT NULL DEFAULT 'IN_PROGRESS',
+  "startedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "completedAt" TIMESTAMP(3),
+  "totalScore" DOUBLE PRECISION,
 
--- CreateTable
-CREATE TABLE "Interview" (
-    "id" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
-    "visaType" "VisaType" NOT NULL,
-    "accentType" TEXT NOT NULL,
-    "totalQuestions" INTEGER NOT NULL,
-    "status" "InterviewStatus" NOT NULL DEFAULT 'IN_PROGRESS',
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "Interview_pkey" PRIMARY KEY ("id")
+  CONSTRAINT "interviews_pkey" PRIMARY KEY ("id")
 );
+CREATE TABLE "interview_questions" (
+  "id" TEXT NOT NULL,
+  "interviewId" TEXT NOT NULL,
+  "questionId" TEXT NOT NULL,
+  "order" INTEGER NOT NULL,
+  "audioUrl" TEXT,
+  "userAnswer" TEXT,
+  "audioAnswer" TEXT,
+  "transcription" TEXT,
+  "score" DOUBLE PRECISION,
+  "feedback" JSONB,
+  "answeredAt" TIMESTAMP(3),
 
--- CreateTable
-CREATE TABLE "InterviewQuestion" (
-    "id" TEXT NOT NULL,
-    "interviewId" TEXT NOT NULL,
-    "questionId" TEXT NOT NULL,
-    "order" INTEGER NOT NULL,
-    "answer" TEXT,
-    "transcription" TEXT,
-    "score" DOUBLE PRECISION,
-    "feedback" TEXT,
-    "answeredAt" TIMESTAMP(3),
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT "InterviewQuestion_pkey" PRIMARY KEY ("id")
+  CONSTRAINT "interview_questions_pkey" PRIMARY KEY ("id")
 );
+CREATE TABLE "reports" (
+  "id" TEXT NOT NULL,
+  "interviewId" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "totalScore" DOUBLE PRECISION NOT NULL,
+  "contentScore" DOUBLE PRECISION NOT NULL,
+  "languageScore" DOUBLE PRECISION NOT NULL,
+  "performanceScore" DOUBLE PRECISION NOT NULL,
+  "riskScore" DOUBLE PRECISION NOT NULL,
+  "strengths" TEXT[],
+  "weaknesses" TEXT[],
+  "suggestions" TEXT[],
+  "overallFeedback" TEXT NOT NULL,
+  "totalQuestions" INTEGER NOT NULL,
+  "averageResponseTime" DOUBLE PRECISION,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
--- CreateTable
-CREATE TABLE "Report" (
-    "id" TEXT NOT NULL,
-    "interviewId" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
-    "totalScore" DOUBLE PRECISION NOT NULL,
-    "contentScore" DOUBLE PRECISION NOT NULL,
-    "languageScore" DOUBLE PRECISION NOT NULL,
-    "performanceScore" DOUBLE PRECISION NOT NULL,
-    "riskScore" DOUBLE PRECISION NOT NULL,
-    "overallFeedback" TEXT NOT NULL,
-    "recommendations" TEXT[],
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT "Report_pkey" PRIMARY KEY ("id")
+  CONSTRAINT "reports_pkey" PRIMARY KEY ("id")
 );
+CREATE TABLE "system_configs" (
+  "id" TEXT NOT NULL,
+  "key" TEXT NOT NULL,
+  "value" TEXT NOT NULL,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL,
 
--- CreateIndex
-CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
-
--- CreateIndex
-CREATE INDEX "Question_visaType_idx" ON "Question"("visaType");
-
--- CreateIndex
-CREATE INDEX "Question_topic_idx" ON "Question"("topic");
-
--- CreateIndex
-CREATE INDEX "Question_difficulty_idx" ON "Question"("difficulty");
-
--- CreateIndex
-CREATE INDEX "Interview_userId_idx" ON "Interview"("userId");
-
--- CreateIndex
-CREATE INDEX "Interview_status_idx" ON "Interview"("status");
-
--- CreateIndex
-CREATE INDEX "InterviewQuestion_interviewId_idx" ON "InterviewQuestion"("interviewId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Report_interviewId_key" ON "Report"("interviewId");
-
--- CreateIndex
-CREATE INDEX "Report_userId_idx" ON "Report"("userId");
-
--- AddForeignKey
-ALTER TABLE "Interview" ADD CONSTRAINT "Interview_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "InterviewQuestion" ADD CONSTRAINT "InterviewQuestion_interviewId_fkey" FOREIGN KEY ("interviewId") REFERENCES "Interview"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "InterviewQuestion" ADD CONSTRAINT "InterviewQuestion_questionId_fkey" FOREIGN KEY ("questionId") REFERENCES "Question"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Report" ADD CONSTRAINT "Report_interviewId_fkey" FOREIGN KEY ("interviewId") REFERENCES "Interview"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Report" ADD CONSTRAINT "Report_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+  CONSTRAINT "system_configs_pkey" PRIMARY KEY ("id")
+);
+CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
+CREATE UNIQUE INDEX "interview_questions_interviewId_order_key" ON "interview_questions"("interviewId", "order");
+CREATE UNIQUE INDEX "reports_interviewId_key" ON "reports"("interviewId");
+CREATE UNIQUE INDEX "system_configs_key_key" ON "system_configs"("key");
+ALTER TABLE "interviews" ADD CONSTRAINT "interviews_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "interview_questions" ADD CONSTRAINT "interview_questions_interviewId_fkey" FOREIGN KEY ("interviewId") REFERENCES "interviews"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "interview_questions" ADD CONSTRAINT "interview_questions_questionId_fkey" FOREIGN KEY ("questionId") REFERENCES "questions"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "reports" ADD CONSTRAINT "reports_interviewId_fkey" FOREIGN KEY ("interviewId") REFERENCES "interviews"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "reports" ADD CONSTRAINT "reports_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
