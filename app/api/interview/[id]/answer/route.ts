@@ -71,10 +71,15 @@ export async function POST(
       audioFile.type || 'audio/webm'
     );
 
+    const transcriptionPayload: Prisma.InputJsonValue = {
+      en: transcription.en,
+      zh: transcription.zh,
+    };
+
     await prisma.interviewQuestion.update({
       where: { id: interviewQuestion.id },
       data: {
-        transcription: transcription as Prisma.JsonValue,
+        transcription: transcriptionPayload,
         answeredAt: new Date(),
       },
     });
