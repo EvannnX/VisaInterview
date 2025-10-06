@@ -25,7 +25,7 @@ export async function GET(
       return new NextResponse('Recording not found', { status: 404 });
     }
 
-    return new NextResponse(interviewQuestion.recording.data, {
+    return new NextResponse(interviewQuestion.recording.data.buffer, {
       status: 200,
       headers: {
         'Content-Type': interviewQuestion.recording.mimeType,
