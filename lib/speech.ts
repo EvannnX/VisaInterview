@@ -2,12 +2,14 @@
 export class AudioRecorder {
   private mediaRecorder: MediaRecorder | null = null;
   private audioChunks: Blob[] = [];
+  private startTimestamp: number | null = null;
 
   async start(): Promise<void> {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       this.mediaRecorder = new MediaRecorder(stream);
       this.audioChunks = [];
+      this.startTimestamp = performance.now();
 
       this.mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
@@ -21,7 +23,7 @@ export class AudioRecorder {
     }
   }
 
-  async stop(): Promise<Blob> {
+  async stop(): Promise<{ blob: Blob; duration: number }> {
     return new Promise((resolve, reject) => {
       if (!this.mediaRecorder) {
         reject(new Error('录音器未初始化'));
@@ -30,7 +32,11 @@ export class AudioRecorder {
 
       this.mediaRecorder.onstop = () => {
         const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
-        resolve(audioBlob);
+        const duration = this.startTimestamp
+          ? (performance.now() - this.startTimestamp) / 1000
+          : 0;
+        this.startTimestamp = null;
+        resolve({ blob: audioBlob, duration });
       };
 
       this.mediaRecorder.stop();

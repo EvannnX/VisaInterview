@@ -162,28 +162,31 @@ export default function InterviewPage({ params }: { params: { id: string } }) {
 
   const stopRecording = async () => {
     try {
-      const audioBlob = await audioRecorder.stop();
+      const { blob: audioBlob, duration } = await audioRecorder.stop();
       setIsRecording(false);
 
-      // 模拟转写（实际应调用 ASR API）
-      const simulatedTranscription = 'This is a simulated transcription. Please configure Azure Speech or OpenAI Whisper for real ASR.';
-      
-      // 保存答案
       const order = interview!.questions[currentQuestionIndex].order;
-      setAnswers(prev => ({ ...prev, [order]: simulatedTranscription }));
 
-      // 提交到服务器
-      await fetch(`/api/interview/${params.id}/answer`, {
+      const formData = new FormData();
+      formData.append('questionOrder', order.toString());
+      formData.append('audio', audioBlob, `answer-${order}.webm`);
+      formData.append('duration', duration.toString());
+
+      const response = await fetch(`/api/interview/${params.id}/answer`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          questionOrder: order,
-          answer: simulatedTranscription,
-          transcription: simulatedTranscription,
-        }),
+        body: formData,
       });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || '保存回答失败');
+      }
+
+      setAnswers((prev) => ({
+        ...prev,
+        [order]: data.transcription?.en || '已保存',
+      }));
 
       toast.success('Recording completed');
     } catch (error: any) {

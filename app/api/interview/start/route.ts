@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '../../../../lib/auth';
 import { prisma } from '../../../../lib/prisma';
 import { z } from 'zod';
+import OpenAI from 'openai';
 
 const startInterviewSchema = z.object({
   visaType: z.enum(['F1_STUDENT', 'H1B_WORK', 'B1B2_TOURIST', 'J1_EXCHANGE', 'L1_TRANSFER']),
@@ -133,44 +134,43 @@ export async function POST(req: NextRequest) {
   }
 }
 
+const openaiClient = process.env.OPENAI_API_KEY
+  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+  : null;
+
 // 翻译函数：将中文转换为英文
 async function translateToEnglish(chineseText: string): Promise<string> {
-  // 如果环境变量中有 OpenAI API Key，使用 GPT 翻译
-  if (process.env.OPENAI_API_KEY) {
-    try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
-          messages: [
-            {
-              role: 'system',
-              content: 'You are a professional translator. Translate the Chinese question into natural English as it would be asked in a US visa interview. Only return the translated question, nothing else.',
-            },
-            {
-              role: 'user',
-              content: chineseText,
-            },
-          ],
-          temperature: 0.3,
-          max_tokens: 200,
-        }),
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        return data.choices[0].message.content.trim();
-      }
-    } catch (error) {
-      console.error('OpenAI translation failed:', error);
-    }
+  if (!openaiClient) {
+    return chineseText;
   }
 
-  // 如果没有配置 OpenAI 或翻译失败，返回带标记的中文
-  // 在实际使用中，用户应该配置翻译API
-  return `[Please translate to English] ${chineseText}`;
+  try {
+    const completion = await openaiClient.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      temperature: 0.2,
+      messages: [
+        {
+          role: 'system',
+          content:
+            'You are a professional translator. Translate the Chinese question into natural English as it would be asked in a US visa interview. Only return the translated question, nothing else.',
+        },
+        {
+          role: 'user',
+          content: chineseText,
+        },
+      ],
+    });
+
+    const translated = completion.choices?.[0]?.message?.content?.trim();
+
+    if (!translated) {
+      console.warn('OpenAI translation returned empty response');
+      return chineseText;
+    }
+
+    return translated;
+  } catch (error) {
+    console.error('OpenAI translation failed:', error);
+    return chineseText;
+  }
 }

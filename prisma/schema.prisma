@@ -119,7 +119,8 @@ model InterviewQuestion {
   audioUrl        String?   // TTS生成的音频URL
   userAnswer      String?   // 用户回答文本
   audioAnswer     String?   // 用户录音URL
-  transcription   String?   // ASR转写文本
+  transcription   Json?     // ASR转写文本
+  recording       Recording?
   score           Float?    // 该题得分
   feedback        Json?     // 反馈内容（JSON格式）
   answeredAt      DateTime?
@@ -130,6 +131,19 @@ model InterviewQuestion {
 
   @@unique([interviewId, order])
   @@map("interview_questions")
+}
+
+model Recording {
+  id                  String   @id @default(cuid())
+  interviewQuestionId String   @unique
+  mimeType            String
+  durationSeconds     Float?
+  data                Bytes
+  createdAt           DateTime @default(now())
+
+  interviewQuestion InterviewQuestion @relation(fields: [interviewQuestionId], references: [id], onDelete: Cascade)
+
+  @@map("recordings")
 }
 
 // 面试报告
