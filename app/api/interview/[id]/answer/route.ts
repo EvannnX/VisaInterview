@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../../../../../lib/auth';
 import { prisma } from '../../../../../lib/prisma';
+import { Prisma } from '@prisma/client';
 import { generateBilingualTranscription } from '../../../../../lib/transcription';
 
 export async function POST(
@@ -73,7 +74,7 @@ export async function POST(
     await prisma.interviewQuestion.update({
       where: { id: interviewQuestion.id },
       data: {
-        transcription,
+        transcription: transcription as Prisma.JsonValue,
         answeredAt: new Date(),
       },
     });

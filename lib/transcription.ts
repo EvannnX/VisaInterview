@@ -1,36 +1,43 @@
 import OpenAI from 'openai';
 
-interface BilingualTranscription {
+export interface BilingualTranscription {
   en: string;
   zh: string;
+  [key: string]: string;
 }
+
+const openaiClient = process.env.OPENAI_API_KEY
+  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+  : null;
 
 export async function generateBilingualTranscription(
   input: Buffer | string,
   mimeType: string
 ): Promise<BilingualTranscription> {
-  if (!process.env.OPENAI_API_KEY) {
+  if (!openaiClient) {
     return {
       en: 'OpenAI API Key 未配置，无法生成转写。',
       zh: 'OpenAI API Key 未配置，无法生成转写。',
     };
   }
 
-  let englishText = '';
+  let englishText: string;
 
   if (Buffer.isBuffer(input)) {
-    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-    const response = await openai.audio.transcriptions.create({
+    const transcription = await openaiClient.audio.transcriptions.create({
       file: new File([input], 'audio.webm', { type: mimeType }),
       model: 'whisper-1',
-      response_format: 'text',
     });
-    englishText = response.trim();
+    englishText = transcription.text?.trim() || '';
   } else {
     englishText = input;
   }
 
-  const translation = await openai.chat.completions.create({
+  if (!englishText) {
+    englishText = 'Transcription unavailable';
+  }
+
+  const translation = await openaiClient.chat.completions.create({
     model: 'gpt-3.5-turbo',
     temperature: 0,
     messages: [
@@ -46,7 +53,7 @@ export async function generateBilingualTranscription(
     ],
   });
 
-  const chineseText = translation.choices[0].message?.content?.trim() || '';
+  const chineseText = translation.choices?.[0]?.message?.content?.trim();
 
   return {
     en: englishText,
