@@ -25,7 +25,9 @@ export async function GET(
       return new NextResponse('Recording not found', { status: 404 });
     }
 
-    return new NextResponse(new Blob([interviewQuestion.recording.data]), {
+    const audioBytes = Uint8Array.from(interviewQuestion.recording.data);
+
+    return new NextResponse(audioBytes, {
       status: 200,
       headers: {
         'Content-Type': interviewQuestion.recording.mimeType,
